@@ -54,6 +54,7 @@ import error : faiss (in jupyter notebook)
     - ['airplane', 'bear', 'bicycle', 'bird', 'boat', 'bottle', 'car', 'cat', 'chair', 'clock', 'dog', 'elephant', 'keyboard', 'knife', 'oven', 'truck']
 - values = (the # of one class datas, the # of k range=1280)
 
+---
 
 ## Tables and Figures to be Created.
 
