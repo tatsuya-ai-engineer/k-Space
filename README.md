@@ -125,6 +125,15 @@ Table 5, encompassing Figure 8 and 9 -> Objective Comparison between Tasks
 - ViT Trained on ImageNet 1k (Careful since, the best model is trained on JFT-300M and not ImageNet 1k) ViT-Cls-1k-Normal
 - ResNet Trained for Object Detection - ResNet-OD-Cls-??-Normal
 
+Oct. 14
+- ResNet-50 ImageNet1k Normal & ResNet-50 Stylized ImageNet
+    
+    [https://github.com/bethgelab/model-vs-human](https://github.com/bethgelab/model-vs-human)
+    
+- ViT-B16 ImageNet1k Normal
+    
+    [https://github.com/lukemelas/PyTorch-Pretrained-ViT](https://github.com/lukemelas/PyTorch-Pretrained-ViT)
+
 ### Experiments
 
 - ResNet-Cls-1k-Normal on Normal Samples
