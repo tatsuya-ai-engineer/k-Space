@@ -1,10 +1,8 @@
 # k-Space
 
-### Problems
-
-import error : umap (in jupyter notebook)
-
-import error : faiss (in jupyter notebook)
+## Oct 13
+Ueda has added a get_dicts folder.
+This folder contains the code to output SoftMax and neighbor_dict.
 
 ## Models
 
