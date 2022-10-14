@@ -1,8 +1,12 @@
 # k-Space
 
-## Oct 13
+## Oct 14 16:30
 Ueda has added a get_dicts folder.
-This folder contains the code to output SoftMax and neighbor_dict.
+This folder contains the code to get model's outputs and neighbor_dicts.
+
+Ueda have acquired a neighbor for the output of the intermediate layer of ResNet50.
+
+Ueda currently working on a row graph of k*-mean, showing each class, and a table of mean±std.
 
 ## Models
 
