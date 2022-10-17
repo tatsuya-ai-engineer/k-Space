@@ -22,118 +22,86 @@ from utils import progress_bar
 
 
 
-def imshow(img, adv_name, save_path):
-    # 非正規化する
-    img = img / 2 + 0.5
-    # torch.Tensor型からnumpy.ndarray型に変換する
-    # print(type(img)) # <class 'torch.Tensor'>
-    npimg = img.to('cpu').detach().numpy().copy()
-    # print(type(npimg))    
-    # 形状を（RGB、縦、横）から（縦、横、RGB）に変換する
-    # print(npimg.shape)
-    npimg = np.transpose(npimg, (1, 2, 0))
-    # print(npimg.shape)
-    # 画像を表示する
-    plt.imshow(npimg)
-    plt.savefig(save_path)
-    # plt.show()
+# def imshow(img, adv_name, save_path):
+#     # 非正規化する
+#     img = img / 2 + 0.5
+#     # torch.Tensor型からnumpy.ndarray型に変換する
+#     # print(type(img)) # <class 'torch.Tensor'>
+#     npimg = img.to('cpu').detach().numpy().copy()
+#     # print(type(npimg))    
+#     # 形状を（RGB、縦、横）から（縦、横、RGB）に変換する
+#     # print(npimg.shape)
+#     npimg = np.transpose(npimg, (1, 2, 0))
+#     # print(npimg.shape)
+#     # 画像を表示する
+#     plt.imshow(npimg)
+#     plt.savefig(save_path)
+#     # plt.show()
     
-    plt.clf()
-    plt.close()
+#     plt.clf()
+#     plt.close()
 
 
 
+target_dataset = ['IN', 'SIN']
+model_name = ['resnet-IN', 'resnet-SIN', 'vit-IN']
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-models = ["resnet50", "google"]
-atk_names = ["pgd", "fgsm", "deepfool", 'onepix']
+classes = ['airplane', 'bear', 'bicycle', 'bird', 
+            'boat', 'bottle', 'car', 'cat', 
+            'chair', 'clock', 'dog', 'elephant',
+            'keyboard', 'knife', 'oven', 'truck']
+
+adv_name = ["pgd", "fgsm", "deepfool", 'onepix']
 
 
-### load original image ######################
-max_idx = [98, 85, 1, 70, 73, 47, 89, 65, 31, 47]
-
-load_path = '/home/ueda-tatsuya/デスクトップ/k-Spectrum/pytorch-cifar_forU/output_dicts/origined_CIFAR10_datas_v2.pkl'
-with open(load_path, mode='rb') as f:
-    dataset = pickle.load(f)
-
-classes = dataset.keys()
-
-imgs = np.empty((0, 3, 32, 32))
-lbs = np.empty((0))
-for max_num, c in enumerate(classes):
-    tensor_img = dataset[c][max_idx[max_num]].unsqueeze(dim=0) 
-    img = tensor_img.to('cpu').detach().numpy().copy()
+for dn in target_dataset:
+    dataset = load_dataset(dn)
     
-    imgs = np.append(imgs, img, axis=0)
-    lbs = np.append(lbs, max_num)
-
-imgs = torch.from_numpy(imgs.astype(np.float32)).clone()
-lbs = torch.from_numpy(lbs.astype(np.int64)).clone()
-
-
-
-for model_name in models:
-    ### load model ######
-    if model_name == "vgg19":
-        net = VGG('VGG19')
-    elif model_name == "resnet50":
-        net = ResNet50()
-    elif model_name == "google":
-        net = GoogLeNet()
-
-    net = net.to(device)
-    if device == 'cuda':
-        net = torch.nn.DataParallel(net)
-        cudnn.benchmark = True
-    checkpoint = torch.load(f'/home/ueda-tatsuya/デスクトップ/k-Spectrum/pytorch-cifar_forU/checkpoint/{model_name}_ckpt.pth')
-    net.load_state_dict(checkpoint['net'])
-
-
-
-    for adv_name in tqdm(atk_names):
-        
-        for i in range(1,11,1):
+    for an in advs_name:
+    
+        for mn in model_name:
+            model = load_model(mn)
+            dataset = load_dataset('IN')
             
+            
+            # AA
             if adv_name == "pgd":
-                atk = torchattacks.PGD(net, eps=i/255, alpha=2/255, steps=40)
+                atk = torchattacks.PGD(model)
             elif adv_name == "fgsm":
-                atk = torchattacks.FGSM(net, eps=i/1000)
+                atk = torchattacks.FGSM(model)
             elif adv_name == "deepfool":
-                atk = torchattacks.DeepFool(net, steps=50, overshoot=i/100)
+                atk = torchattacks.DeepFool(model)
             elif adv_name == "onepix":
-                atk = torchattacks.OnePixel(net, pixels=i, steps=75, popsize=400, inf_batch=128)
+                atk = torchattacks.OnePixel(model, pixels=1)
             
-            adv_images = atk(imgs, lbs)
-            imshow(torchvision.utils.make_grid(adv_images), adv_name+str(i),
-                save_path=f"./adv_imgs/{model_name}/{adv_name+str(i)}.png")
-            
-            
-            ### test ###
-            if model_name == "vgg19":
-                test_net = VGG('VGG19')
-            elif model_name == "resnet50":
-                test_net = ResNet50()
-            elif model_name == "google":
-                test_net = GoogLeNet()
+            with torch.no_grad():
+                proc_dict = {}
+                
+                logits_arr = np.empty((0, 1000))
+                label_arr = []
+                for images, target, _ in tqdm(dataset.loader):
+                    images = images.to(device())
+                    label = [int(classes.index(i)) for i in target]
+                    # label = int(classes.index(target[0]))
+                    
+                    
+                    
+                    adv_images = atk(images, label)
+                    
+                    # extract adv's SoftMax
+                    logits = out_logits(mn, model, adv_images)
+                    logits = logits.reshape((batch_size, -1))
+                    
+                    logits_arr = np.append(logits_arr, logits, axis=0)
+                    label_arr.extend(label)
+                
+                for ci, cn in enumerate(classes):
+                    proc_dict[cn] = logits_arr[np.where(np.array(label_arr) == ci)]
+                    print(proc_dict[cn].shape)
+                    
+                # save softmax
+                save_dir = '/home/ueda-tatsuya/デスクトップ/k-Spectrum/model-vs-human/softmax_dict_1017/'
+                with open(save_dir + f'{an}_{dn}_to_{mn}.pkl', 'wb') as p:
+                    pickle.dump(proc_dict, p)
 
-            test_net = test_net.to(device)
-            if device == 'cuda':
-                test_net = torch.nn.DataParallel(test_net)
-                cudnn.benchmark = True
-            
-            for aug_n in range(5):
-                checkpoint = torch.load(f'/home/ueda-tatsuya/デスクトップ/k-Spectrum/pytorch-cifar_forU/checkpoint/{model_name}_aug{aug_n}_ckpt.pth')
-                test_net.load_state_dict(checkpoint['net'])
-                
-                soft = test_net(adv_images)
-                pred = torch.max(soft.data, 1)
-                
-                out_dict = {
-                    "softmax": soft,
-                    "prediction list": pred[1]
-                }
-                
-                save_path = f'./adv_imgs/{model_name}/{adv_name+str(i)}_aug{aug_n}.pkl'
-                with open(save_path, 'wb') as p:
-                    pickle.dump(out_dict , p)
 

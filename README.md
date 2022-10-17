@@ -8,6 +8,10 @@ Ueda have acquired a neighbor for the output of the intermediate layer of ResNet
 
 Ueda currently working on a row graph of k*-mean, showing each class, and a table of mean±std.
 
+## Oct 17 17:00
+Ueda saved all the neighborhoods for the analysis to be published. (excluding neighbors for different tasks)
+
+
 ## Models
 
 - ResNet50
