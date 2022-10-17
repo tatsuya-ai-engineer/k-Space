@@ -62,8 +62,8 @@ Ueda saved all neighborhood data in a GoogleDrive zip file.
     - ['airplane', 'bear', 'bicycle', 'bird', 'boat', 'bottle', 'car', 'cat', 'chair', 'clock', 'dog', 'elephant', 'keyboard', 'knife', 'oven', 'truck']
 - values = (the # of one class datas, the # of k range=1280)
 
----
-### neighbors dicts on Google Drive
+--
+### Neighbors dicts on Google Drive
 - https://drive.google.com/file/d/1p5e4XZBTNOQYWNtk17bXVdkwY-uivOef/view?usp=sharing
 
 ---
