@@ -11,6 +11,8 @@ Ueda currently working on a row graph of k*-mean, showing each class, and a tabl
 ## Oct 17 17:00
 Ueda saved all the neighborhoods for the analysis to be published. (excluding neighbors for different tasks)
 
+Ueda saved all neighborhood data in a GoogleDrive zip file.
+
 
 ## Models
 
@@ -59,6 +61,10 @@ Ueda saved all the neighborhoods for the analysis to be published. (excluding ne
 - keys = ImageNet classes
     - ['airplane', 'bear', 'bicycle', 'bird', 'boat', 'bottle', 'car', 'cat', 'chair', 'clock', 'dog', 'elephant', 'keyboard', 'knife', 'oven', 'truck']
 - values = (the # of one class datas, the # of k range=1280)
+
+---
+### neighbors dicts on Google Drive
+- https://drive.google.com/file/d/1p5e4XZBTNOQYWNtk17bXVdkwY-uivOef/view?usp=sharing
 
 ---
 
